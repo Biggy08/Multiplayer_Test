@@ -22,7 +22,7 @@ func _physics_process(delta: float) -> void:
 	#Can't Control the player if you don't have the authority
 	#So host and client can't control each other characters (host can't control both players)
 	if !is_multiplayer_authority():
-		return
+		return	
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta

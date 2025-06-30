@@ -10,10 +10,11 @@ config_version=5
 
 [application]
 
-config/name="Multiplayer Test"
+config/name="LAG"
 run/main_scene="res://scenes/menu/MainMenu.tscn"
 config/features=PackedStringArray("4.3", "Mobile")
-config/icon="res://icon.svg"
+boot_splash/image="res://assets/logo/Logo2.png"
+config/icon="res://assets/logo/Logo2.png"
 
 [editor_plugins]
 
