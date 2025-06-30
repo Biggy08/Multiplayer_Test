@@ -229,10 +229,6 @@ text = "Join
 
 "
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://scenes/player.tscn")
-spawn_path = NodePath("..")
-
 [node name="sound_click" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("4_bhoiw")
 
@@ -244,7 +240,11 @@ offset_bottom = 39.0
 text = "Exit
 "
 
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://scenes/game/player.tscn")
+spawn_path = NodePath("..")
+
 [connection signal="pressed" from="UI/Multiplayer/VBoxContainer/Host" to="." method="_on_host_pressed"]
-[connection signal="pressed" from="UI/Multiplayer/VBoxContainer/Join" to="." method="_on_client_pressed"]
 [connection signal="pressed" from="UI/Multiplayer/VBoxContainer/Join" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="UI/Multiplayer/VBoxContainer/Join" to="." method="_on_client_pressed"]
 [connection signal="pressed" from="Exit" to="." method="_on_exit_pressed"]

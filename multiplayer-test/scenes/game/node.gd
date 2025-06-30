@@ -2,7 +2,7 @@
 extends Node
 
 @onready var multiplayer_ui = $UI/Multiplayer
-const PLAYER = preload("res://scenes/player.tscn")
+const PLAYER = preload("res://scenes/game/player.tscn")
 var peer = ENetMultiplayerPeer.new()
 
 func _on_host_pressed() -> void:
@@ -34,4 +34,4 @@ func add_player(pid):
 	player.name = str(pid)     #naming the player
 	add_child(player)
 	
-	
+	print_stack()
