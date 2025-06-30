@@ -1,10 +1,12 @@
-[gd_scene load_steps=32 format=3 uid="uid://c5won7nctd8y6"]
+[gd_scene load_steps=34 format=3 uid="uid://c5won7nctd8y6"]
 
-[ext_resource type="Texture2D" uid="uid://dgfe2a4ohwoxw" path="res://assets/Jump (32x32).png" id="1_gv3r6"]
-[ext_resource type="Script" path="res://scenes/player.gd" id="1_uu06s"]
-[ext_resource type="Texture2D" uid="uid://c5152p7i1s7m" path="res://assets/Idle (32x32).png" id="2_duttb"]
-[ext_resource type="Texture2D" uid="uid://xwyx73pv1t1v" path="res://assets/Fall (32x32).png" id="2_ek8yq"]
-[ext_resource type="Texture2D" uid="uid://b53cqmi85e0h2" path="res://assets/Run (32x32).png" id="5_8psxn"]
+[ext_resource type="Texture2D" uid="uid://dgfe2a4ohwoxw" path="res://assets/players/Jump (32x32).png" id="1_gv3r6"]
+[ext_resource type="Script" path="res://scenes/game/player.gd" id="1_uu06s"]
+[ext_resource type="Texture2D" uid="uid://c5152p7i1s7m" path="res://assets/players/Idle (32x32).png" id="2_duttb"]
+[ext_resource type="Texture2D" uid="uid://xwyx73pv1t1v" path="res://assets/players/Fall (32x32).png" id="2_ek8yq"]
+[ext_resource type="Texture2D" uid="uid://b53cqmi85e0h2" path="res://assets/players/Run (32x32).png" id="5_8psxn"]
+[ext_resource type="AudioStream" uid="uid://qnja1oofjfn3" path="res://assets/sounds/Pisto Shooting.mp3" id="6_121pn"]
+[ext_resource type="AudioStream" uid="uid://dljll8qcmfekj" path="res://assets/sounds/sfx_jump.mp3" id="7_rxiur"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_uolrw"]
 atlas = ExtResource("2_duttb")
@@ -208,7 +210,7 @@ properties/0/replication_mode = 1
 [node name="player" type="CharacterBody2D"]
 script = ExtResource("1_uu06s")
 
-[node name="p_name" type="Label" parent="."]
+[node name="NameLabel" type="Label" parent="."]
 offset_left = 207.0
 offset_top = 138.0
 offset_right = 247.0
@@ -216,10 +218,11 @@ offset_bottom = 161.0
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
-position = Vector2(228.5, 195.5)
-scale = Vector2(2.09375, 2.09375)
+position = Vector2(231, 195)
+scale = Vector2(1.75, 2.09375)
 sprite_frames = SubResource("SpriteFrames_0ntfe")
-animation = &"jumping"
+animation = &"running"
+frame_progress = 0.446671
 flip_h = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -228,3 +231,12 @@ shape = SubResource("CapsuleShape2D_qeq4o")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_p6u22")
+
+[node name="sfx_run" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_121pn")
+volume_db = 0.12
+pitch_scale = 5.91
+autoplay = true
+
+[node name="sfx_jump" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_rxiur")

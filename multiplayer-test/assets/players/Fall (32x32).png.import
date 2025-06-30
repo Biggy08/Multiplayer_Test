@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dh66ac3lqpiko"
-path="res://.godot/imported/Terrain (16x16).png-08440d825000be5cd6a24cdf2c2e8ddf.ctex"
+uid="uid://xwyx73pv1t1v"
+path="res://.godot/imported/Fall (32x32).png-ac1e66802e81fe5b2bf9c7371ed1ed6f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/Terrain (16x16).png"
-dest_files=["res://.godot/imported/Terrain (16x16).png-08440d825000be5cd6a24cdf2c2e8ddf.ctex"]
+source_file="res://assets/players/Fall (32x32).png"
+dest_files=["res://.godot/imported/Fall (32x32).png-ac1e66802e81fe5b2bf9c7371ed1ed6f.ctex"]
 
 [params]
 

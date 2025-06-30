@@ -1,3 +1,4 @@
+#Game Node Script
 extends Node
 
 @onready var multiplayer_ui = $UI/Multiplayer
@@ -5,12 +6,14 @@ const PLAYER = preload("res://scenes/player.tscn")
 var peer = ENetMultiplayerPeer.new()
 
 func _on_host_pressed() -> void:
+	$sound_click.play()
+	print(" GAME has been HOSTED")
 	peer.create_server(8848)
 	multiplayer.multiplayer_peer = peer
 	
 	multiplayer.peer_connected.connect(
 	func(pid):
-		print("Player " + str(pid) + " has JOINED ")
+		print("PLAYER  " + str(pid) + " has JOINED ")
 		add_player(pid)		#spawn player for client
 		)
 		
@@ -19,6 +22,8 @@ func _on_host_pressed() -> void:
 
 
 func _on_join_pressed() -> void:
+	
+	$sound_click.play()
 	peer.create_client("localhost",8848)
 	multiplayer.multiplayer_peer = peer
 	multiplayer_ui.hide()
@@ -28,3 +33,5 @@ func add_player(pid):
 	var player = PLAYER.instantiate()
 	player.name = str(pid)     #naming the player
 	add_child(player)
+	
+	
