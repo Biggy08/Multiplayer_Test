@@ -13,7 +13,7 @@ config_version=5
 config/name="LAG"
 run/main_scene="res://scenes/menu/MainMenu.tscn"
 config/features=PackedStringArray("4.3", "Mobile")
-boot_splash/image="res://assets/logo/Logo2.png"
+boot_splash/image="res://assets/screens/Screen1.png"
 config/icon="res://assets/logo/Logo2.png"
 
 [editor_plugins]

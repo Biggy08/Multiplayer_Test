@@ -476,6 +476,7 @@ offset_bottom = 40.0
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 1
 anchors_preset = -1
+anchor_top = -0.725
 anchor_bottom = -0.725
 offset_top = 15.0
 offset_right = 166.0
