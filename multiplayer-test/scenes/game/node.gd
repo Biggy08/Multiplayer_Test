@@ -4,6 +4,11 @@ extends Node
 const PLAYER = preload("res://scenes/game/player.tscn")
 var peer = ENetMultiplayerPeer.new()
 
+var players: Array[Player] = []
+
+func _ready():
+	$MultiplayerSpawner.spawn_function = add_player
+
 # =============================
 # When HOST is pressed
 # =============================
@@ -18,7 +23,7 @@ func _on_host_pressed() -> void:
 	# Handle player joining
 	multiplayer.peer_connected.connect(func(pid):
 		print("PLAYER " + str(pid) + " has JOINED")
-		add_player(pid)  # Spawn new player's avatar
+		$MultiplayerSpawner.spawn(pid)  # Spawn new player's avatar
 	)
 
 	# Handle player leaving
@@ -26,11 +31,13 @@ func _on_host_pressed() -> void:
 		print("PLAYER " + str(pid) + " has LEFT")
 		var player_node = get_node_or_null(str(pid))
 		if player_node:
-			player_node.queue_free()  # Remove their avatar
+			player_node.queue_free()
+			players = players.filter(func(p): return p.name != str(pid))
+
 	)
 
 	# Add the host's own player
-	add_player(multiplayer.get_unique_id())
+	$MultiplayerSpawner.spawn(multiplayer.get_unique_id())
 
 	# Hide UI
 	multiplayer_ui.hide()
@@ -41,7 +48,6 @@ func _on_host_pressed() -> void:
 # =============================
 func _on_join_pressed() -> void:
 	$sound_click.play()
-
 	# Connect to server (host) at localhost:8848
 	peer.create_client("localhost", 8848)
 	multiplayer.multiplayer_peer = peer
@@ -52,6 +58,8 @@ func _on_join_pressed() -> void:
 		var player_node = get_node_or_null(str(pid))
 		if player_node:
 			player_node.queue_free()
+			players = players.filter(func(p): return p.name != str(pid))
+
 	)
 
 	# Handle disconnection from the host
@@ -71,7 +79,11 @@ func _on_join_pressed() -> void:
 func add_player(pid):
 	var player = PLAYER.instantiate()
 	player.name = str(pid)  # Name node by player ID
-	add_child(player)
+	
+	player.global_position= $TextureRect/Lobby.get_child(players.size()).global_position
+	players.append(player)
+	return player
+	
 
 
 
@@ -82,18 +94,7 @@ func get_safe_unique_id():
 		print("Warning: multiplayer peer not active.")
 		return -1  # or null
 
-# =============================
-# When BACK is pressed (leave game)
-# =============================
-func _on_back_pressed() -> void:
-	var pid = get_safe_unique_id()
-	if pid != -1:
-		var player_node = get_node_or_null(str(pid))
-		if player_node:
-			player_node.queue_free()
 
-	multiplayer.multiplayer_peer = null
-	get_tree().change_scene_to_file("res://scenes/menu/MainMenu.tscn")
 
 
 
@@ -112,3 +113,18 @@ func show_host_disconnected_message():
 		get_tree().change_scene_to_file("res://scenes/menu/MainMenu.tscn")
 	
 	)
+
+
+# =============================
+# When BACK is pressed (leave game)
+# =============================
+func _on_back_pressed() -> void:
+	$sound_click.play()
+	var pid = get_safe_unique_id()
+	if pid != -1:
+		var player_node = get_node_or_null(str(pid))
+		if player_node:
+			player_node.queue_free()
+
+	multiplayer.multiplayer_peer = null
+	get_tree().change_scene_to_file("res://scenes/menu/MainMenu.tscn")
