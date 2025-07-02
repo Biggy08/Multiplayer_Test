@@ -1,3 +1,4 @@
+class_name Game #for simplifications (like type hints)
 extends Node
 
 @onready var multiplayer_ui = $UI/Multiplayer
@@ -5,6 +6,7 @@ extends Node
 const PLAYER = preload("res://scenes/game/player.tscn")
 var peer = ENetMultiplayerPeer.new()
 var players: Array[Player] = []
+
 
 func _ready():
 	$MultiplayerSpawner.spawn_function = add_player
@@ -129,3 +131,9 @@ func _on_back_pressed() -> void:
 
 	multiplayer.multiplayer_peer = null
 	get_tree().change_scene_to_file("res://scenes/menu/MainMenu.tscn")
+
+
+## Random Spawn Points for respawn
+
+func get_random_spawnpoint():
+	return $TextureRect/Lobby.get_children().pick_random().get_position()
