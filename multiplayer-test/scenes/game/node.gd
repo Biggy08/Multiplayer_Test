@@ -9,13 +9,21 @@ func _ready():
 	$MultiplayerSpawner.spawn_function = add_player
 
 # =========================================
-# 🔧 Get Valid LAN IP (Works on Android + PC)
+# 🔧 Get Valid LAN IP (Android + PC)
 # =========================================
 func get_valid_lan_ip() -> String:
+	var valid_ips = []
 	for ip in IP.get_local_addresses():
-		if ip.begins_with("192.") or ip.begins_with("10.") or ip.begins_with("172."):
-			return ip
-	return "IP_NOT_FOUND"
+		if ip.is_valid_ip_address() and not ip.begins_with("127.") and ip.find(":") == -1:
+			if ip.begins_with("192.") or ip.begins_with("10.") or ip.begins_with("172."):
+				valid_ips.append(ip)
+
+	if valid_ips.size() > 0:
+		print("📡 Valid LAN IPs: ", valid_ips)
+		return valid_ips[0]
+	else:
+		print("⚠️ No valid LAN IP found. All IPs: ", IP.get_local_addresses())
+		return "IP_NOT_FOUND"
 
 # =========================================
 # 🎮 HOST
@@ -44,8 +52,9 @@ func _on_host_pressed() -> void:
 
 	# 🖥 Show Host IP
 	var ip = get_valid_lan_ip()
+	print("🌐 Host LAN IP: ", ip)
 	var label = multiplayer_ui.get_node("MarginContainer/VBoxContainer/HostIPLabel")
-	label.text = "IP not found!" if ip == "IP_NOT_FOUND" else "Your IP: " + ip
+	label.text = "⚠️ IP not found!" if ip == "IP_NOT_FOUND" else "📡 Your IP: " + ip
 
 # =========================================
 # 🤝 JOIN
@@ -56,9 +65,9 @@ func _on_join_pressed() -> void:
 	var input_field = multiplayer_ui.get_node("MarginContainer/VBoxContainer/HostIPField")
 	var ip_address = input_field.text.strip_edges()
 	if ip_address == "":
-		ip_address = "192.168.1.5"  # default test IP if left blank
+		ip_address = "192.168.1.5"  # Fallback for test
 
-	print("🌐 Connecting to host at: ", ip_address)
+	print("🔌 Connecting to host at: ", ip_address)
 
 	peer.create_client(ip_address, 8848)
 	multiplayer.multiplayer_peer = peer
@@ -72,7 +81,7 @@ func _on_join_pressed() -> void:
 	)
 
 	multiplayer.server_disconnected.connect(func():
-		print("🚫 Disconnected from host")
+		print("🔌 Disconnected from host")
 		show_host_disconnected_message()
 	)
 
