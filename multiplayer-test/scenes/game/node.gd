@@ -1,16 +1,17 @@
 extends Node
 
 @onready var multiplayer_ui = $UI/Multiplayer
+@onready var host_ip_label = $UI/HostIPLabel
 const PLAYER = preload("res://scenes/game/player.tscn")
 var peer = ENetMultiplayerPeer.new()
 var players: Array[Player] = []
 
 func _ready():
 	$MultiplayerSpawner.spawn_function = add_player
+	host_ip_label.hide() 
 
-# =========================================
-# 🔧 Get Valid LAN IP (Android + PC)
-# =========================================
+# Get Valid LAN IP (Android + PC)
+
 func get_valid_lan_ip() -> String:
 	var valid_ips = []
 	for ip in IP.get_local_addresses():
@@ -19,15 +20,14 @@ func get_valid_lan_ip() -> String:
 				valid_ips.append(ip)
 
 	if valid_ips.size() > 0:
-		print("📡 Valid LAN IPs: ", valid_ips)
+		print("Valid LAN IPs: ", valid_ips)
 		return valid_ips[0]
 	else:
-		print("⚠️ No valid LAN IP found. All IPs: ", IP.get_local_addresses())
+		print("No valid LAN IP found. All IPs: ", IP.get_local_addresses())
 		return "IP_NOT_FOUND"
 
-# =========================================
-# 🎮 HOST
-# =========================================
+
+# HOST
 func _on_host_pressed() -> void:
 	$sound_click.play()
 	print("🎮 GAME HOSTED")
@@ -36,12 +36,12 @@ func _on_host_pressed() -> void:
 	multiplayer.multiplayer_peer = peer
 
 	multiplayer.peer_connected.connect(func(pid):
-		print("✅ PLAYER JOINED: ", pid)
+		print(" PLAYER JOINED: ", pid)
 		$MultiplayerSpawner.spawn(pid)
 	)
 
 	multiplayer.peer_disconnected.connect(func(pid):
-		print("❌ PLAYER LEFT: ", pid)
+		print("PLAYER LEFT: ", pid)
 		var player_node = get_node_or_null(str(pid))
 		if player_node:
 			player_node.queue_free()
@@ -52,13 +52,13 @@ func _on_host_pressed() -> void:
 
 	# 🖥 Show Host IP
 	var ip = get_valid_lan_ip()
-	print("🌐 Host LAN IP: ", ip)
-	var label = multiplayer_ui.get_node("MarginContainer/VBoxContainer/HostIPLabel")
-	label.text = "⚠️ IP not found!" if ip == "IP_NOT_FOUND" else "📡 Your IP: " + ip
+	print(" Host LAN IP: ", ip)
+	host_ip_label.text = " IP not found!" if ip == "IP_NOT_FOUND" else "📡 Your IP: " + ip
+	host_ip_label.show()
 
-# =========================================
-# 🤝 JOIN
-# =========================================
+	multiplayer_ui.hide()
+	
+#  JOIN
 func _on_join_pressed() -> void:
 	$sound_click.play()
 
@@ -86,10 +86,9 @@ func _on_join_pressed() -> void:
 	)
 
 	multiplayer_ui.hide()
+	host_ip_label.hide() 
 
-# =========================================
-# 🧍‍♂️ SPAWN PLAYER
-# =========================================
+# SPAWN PLAYER
 func add_player(pid):
 	var player = PLAYER.instantiate()
 	player.name = str(pid)
@@ -97,17 +96,16 @@ func add_player(pid):
 	players.append(player)
 	return player
 
-# =========================================
-# 🔑 Get Safe Unique ID
-# =========================================
+
+#  Get Safe Unique ID
 func get_safe_unique_id():
 	if multiplayer.has_multiplayer_peer():
 		return multiplayer.get_unique_id()
 	return -1
 
-# =========================================
-# ❌ Host Disconnected Popup
-# =========================================
+
+# Host Disconnected Popup
+
 func show_host_disconnected_message():
 	var popup = AcceptDialog.new()
 	popup.dialog_text = "Host disconnected. Returning to menu."
@@ -118,9 +116,9 @@ func show_host_disconnected_message():
 		get_tree().change_scene_to_file("res://scenes/menu/MainMenu.tscn")
 	)
 
-# =========================================
-# 🔙 BACK Button
-# =========================================
+
+# BACK Button
+
 func _on_back_pressed() -> void:
 	$sound_click.play()
 	var pid = get_safe_unique_id()

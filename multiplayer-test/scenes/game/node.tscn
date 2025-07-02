@@ -465,6 +465,12 @@ theme_override_font_sizes/font_size = 30
 text = "Map2
 "
 
+[node name="HostIPLabel" type="Label" parent="UI"]
+offset_left = 5.0
+offset_top = 40.0
+offset_right = 171.0
+offset_bottom = 63.0
+
 [node name="Multiplayer" type="Control" parent="UI"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 3
@@ -489,9 +495,6 @@ metadata/_edit_use_anchors_ = true
 layout_mode = 2
 
 [node name="HostIPField" type="LineEdit" parent="UI/Multiplayer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="HostIPLabel" type="Label" parent="UI/Multiplayer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
 [node name="Host" type="Button" parent="UI/Multiplayer/MarginContainer/VBoxContainer"]
