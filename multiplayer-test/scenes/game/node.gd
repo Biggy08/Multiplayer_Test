@@ -16,90 +16,89 @@ func _on_host_pressed() -> void:
 	$sound_click.play()
 	print(" GAME has been HOSTED")
 
-	# Start the server on port 8848
 	peer.create_server(8848)
 	multiplayer.multiplayer_peer = peer
 
-	# Handle player joining
 	multiplayer.peer_connected.connect(func(pid):
 		print("PLAYER " + str(pid) + " has JOINED")
-		$MultiplayerSpawner.spawn(pid)  # Spawn new player's avatar
+		$MultiplayerSpawner.spawn(pid)
 	)
 
-	# Handle player leaving
 	multiplayer.peer_disconnected.connect(func(pid):
 		print("PLAYER " + str(pid) + " has LEFT")
 		var player_node = get_node_or_null(str(pid))
 		if player_node:
 			player_node.queue_free()
 			players = players.filter(func(p): return p.name != str(pid))
-
 	)
 
-	# Add the host's own player
 	$MultiplayerSpawner.spawn(multiplayer.get_unique_id())
 
-	# Hide UI
-	multiplayer_ui.hide()
+	# ✅ Show host IP in HostIPLabel (safe for Godot 4)
+	var ip_list = IP.get_local_addresses()
+	var lan_ip = ""
+	for ip in ip_list:
+		if ip.begins_with("192.") or ip.begins_with("10.") or ip.begins_with("172."):
+			lan_ip = ip
+			break
 
+	var ip_text = "IP not found"
+	if lan_ip != "":
+		ip_text = "Your IP: " + lan_ip
+
+	multiplayer_ui.get_node("MarginContainer/VBoxContainer/HostIPLabel").text = ip_text
 
 # =============================
 # When JOIN is pressed
 # =============================
 func _on_join_pressed() -> void:
 	$sound_click.play()
-	# Connect to server (host) at localhost:8848
-	peer.create_client("localhost", 8848)
+
+	var ip_address = multiplayer_ui.get_node("MarginContainer/VBoxContainer/HostIPField").text.strip_edges()
+	if ip_address == "":
+		ip_address = "192.168.1.5"  # fallback for test
+
+	print("Trying to connect to host at: ", ip_address)
+	peer.create_client(ip_address, 8848)
 	multiplayer.multiplayer_peer = peer
 
-	# Handle other players disconnecting
 	multiplayer.peer_disconnected.connect(func(pid):
 		print("PLAYER " + str(pid) + " has LEFT")
 		var player_node = get_node_or_null(str(pid))
 		if player_node:
 			player_node.queue_free()
 			players = players.filter(func(p): return p.name != str(pid))
-
 	)
 
-	# Handle disconnection from the host
 	multiplayer.server_disconnected.connect(func():
 		print("Disconnected from host")
-		show_host_disconnected_message()  # Show popup and return to menu
+		show_host_disconnected_message()
 	)
 
-	# Hide UI
 	multiplayer_ui.hide()
-
-
 
 # =============================
 # Add a player to the scene
 # =============================
 func add_player(pid):
 	var player = PLAYER.instantiate()
-	player.name = str(pid)  # Name node by player ID
-	
-	player.global_position= $TextureRect/Lobby.get_child(players.size()).global_position
+	player.name = str(pid)
+	player.global_position = $TextureRect/Lobby.get_child(players.size()).global_position
 	players.append(player)
 	return player
-	
 
-
-
+# =============================
+# Get Unique ID (safe)
+# =============================
 func get_safe_unique_id():
 	if multiplayer.has_multiplayer_peer():
 		return multiplayer.get_unique_id()
 	else:
 		print("Warning: multiplayer peer not active.")
-		return -1  # or null
-
-
-
-
+		return -1
 
 # =============================
-# Show message when host disconnects
+# Host disconnected popup
 # =============================
 func show_host_disconnected_message():
 	print("Host disconnected — multiplayer is no longer active.")
@@ -111,12 +110,10 @@ func show_host_disconnected_message():
 
 	popup.confirmed.connect(func():
 		get_tree().change_scene_to_file("res://scenes/menu/MainMenu.tscn")
-	
 	)
 
-
 # =============================
-# When BACK is pressed (leave game)
+# BACK Button
 # =============================
 func _on_back_pressed() -> void:
 	$sound_click.play()
