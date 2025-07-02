@@ -4,8 +4,19 @@ extends CharacterBody2D
 
 const SPEED = 300.0
 const JUMP_VELOCITY = -400.0
-@onready var sprite_2d: AnimatedSprite2D = $Sprite2D
+const MAX_HEALTH = 100
+const RESPAWN_TIME = 3
 
+const BULLET  = preload("res://scenes/game/bullet.tscn")
+@onready var sprite_2d: AnimatedSprite2D = $Sprite2D
+@onready var sfx_death: AudioStreamPlayer2D = $sfx_death
+@onready var sfx_respawn: AudioStreamPlayer2D = $sfx_respawn
+@onready var sfx_shoot_1: AudioStreamPlayer2D = $sfx_shoot1
+
+
+@onready var game: Game = get_parent()
+
+var health = MAX_HEALTH
 var facing_left = false
 
 # For individual control of Host and Client player (separated control )
@@ -24,6 +35,16 @@ func _physics_process(delta: float) -> void:
 	#So host and client can't control each other characters (host can't control both players)
 	if !is_multiplayer_authority():
 		return	
+		
+	$GunContainer.look_at(get_global_mouse_position())
+	
+	if get_global_mouse_position().x < global_position.x:
+		$GunContainer/GunSprite.flip_v = true
+	else:
+		$GunContainer/GunSprite.flip_v = false
+		
+	if Input.is_action_just_pressed("shoot"):
+		shoot.rpc(multiplayer.get_unique_id())
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
@@ -66,3 +87,34 @@ func _physics_process(delta: float) -> void:
 	
 	var is_left = velocity.x < 0  #(moving toward -ve x axis = left)
 	sprite_2d.flip_h = is_left
+	
+	# Combat
+
+@rpc("call_local")
+func shoot(shooter_pid):
+	$sfx_shoot1.play()
+	var bullet = BULLET.instantiate()
+	bullet.set_multiplayer_authority(shooter_pid)
+	get_parent().add_child(bullet)
+	bullet.transform = $GunContainer/GunSprite/Muzzle.global_transform
+		
+
+@rpc("any_peer")
+func take_damage(amount):
+	health -= amount
+
+	if health <= 0:
+		hide()
+		set_physics_process(false)
+		$sfx_death.play()
+
+		await get_tree().create_timer(RESPAWN_TIME).timeout
+
+		health = MAX_HEALTH
+		global_position = game.get_random_spawnpoint()
+		show()
+		set_physics_process(true)
+		$sfx_respawn.play()
+
+		
+		
