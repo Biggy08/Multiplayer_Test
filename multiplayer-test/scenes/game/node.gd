@@ -1,3 +1,4 @@
+class_name Game
 extends Node
 
 @onready var multiplayer_ui = $UI/Multiplayer
@@ -129,3 +130,7 @@ func _on_back_pressed() -> void:
 
 	multiplayer.multiplayer_peer = null
 	get_tree().change_scene_to_file("res://scenes/menu/MainMenu.tscn")
+
+#Spawning
+func get_random_spawnpoint():
+	return $TextureRect/Lobby.get_children().pick_random().global_position
